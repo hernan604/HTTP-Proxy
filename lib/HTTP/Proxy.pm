@@ -1263,13 +1263,15 @@ C<HTTP::Proxy> offers you the possibility of easily url redirect.
 This redirect feature can be useful on scenarios where you want to 
 load a developer version of a javascript or css file on a production
 website. 
-It works like this:
-- Your browser requests http://www.somepage.com/page.htm
-- Your proxy handles the request and checks if there is any redirect
-  for that url
-- If there is a redirect, get the content and return it to browser
 
-And, an usage example of simple url redirect with C<HTTP::Proxy>:
+It works like this:
+
+    - The browser requests http://www.somepage.com/page.htm
+    - Foreach request within this page, verify if there is any redirect for url
+    - If there is a redirect, get the content from the defined redirect url 
+      and return it to browser, as it is comming from the original url.
+
+An usage example of simple url redirect with C<HTTP::Proxy>:
 
     use HTTP::Proxy;
     my $proxy = HTTP::Proxy->new( port => 13128 );
@@ -1279,8 +1281,10 @@ And, an usage example of simple url redirect with C<HTTP::Proxy>:
     $proxy->start;
     1;
 
-This would result in yahoo.com showing up in your browser when you
-open http://www.google.com while on the properly configured proxy.
+And open http://www.google.com while on the properly configured proxy.
+This will result in: 
+browser url http://www.google.com with content from http://www.yahoo.com
+
 
 
 =over 4
