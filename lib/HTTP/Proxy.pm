@@ -320,6 +320,9 @@ sub serve_connections {
                 if $conn->reason ne 'No more requests from this connection';
             return;
         }
+        if ( defined $self->stash('redirects') and exists $self->stash( 'redirects' )->{ $req->uri->as_string } ) {
+            $req->uri( $self->stash( 'redirects' )->{ $req->uri->as_string } );
+        }
         $self->log( STATUS, "REQUEST", $req->method . ' '
            . ( $req->method eq 'CONNECT' ? $req->uri->host_port : $req->uri ) );
 
@@ -1253,6 +1256,32 @@ way the HTTP and TCP connections are handled.
 The following attributes control the TCP connection. They are passed to
 the underlying C<HTTP::Proxy::Engine>, which may (or may not) use them
 to change its behaviour.
+
+=head2 Redirect url ( style man in the middle )
+
+C<HTTP::Proxy> offers you the possibility of easily url redirect.
+This redirect feature can be useful on scenarios where you want to 
+load a developer version of a javascript or css file on a production
+website. 
+It works like this:
+- Your browser requests http://www.somepage.com/page.htm
+- Your proxy handles the request and checks if there is any redirect
+  for that url
+- If there is a redirect, get the content and return it to browser
+
+And, an usage example of simple url redirect with C<HTTP::Proxy>:
+
+    use HTTP::Proxy;
+    my $proxy = HTTP::Proxy->new( port => 13128 );
+    $proxy->stash( redirects => {
+      'http://www.google.com/' => 'http://www.yahoo.com/',
+    } );
+    $proxy->start;
+    1;
+
+This would result in yahoo.com showing up in your browser when you
+open http://www.google.com while on the properly configured proxy.
+
 
 =over 4
 
